@@ -6,23 +6,25 @@ export async function createProperty(input) {
     ...input,
     description: input.description ?? '',
     attributes: input.attributes ?? {},
+    imageUrls: input.imageUrls ?? [],
   });
   return property;
 }
 
 export async function getPropertyById(id) {
-  const property = await Property.findById(id).lean();
+  const property = await Property.findById(id).populate('assignedAgentId', 'name email').lean();
   if (!property) throw notFound('Property not found');
   return property;
 }
 
-export async function listProperties({ isClient, query }) {
+export async function listProperties({ role, query }) {
   const filter = {};
 
-  if (isClient) filter.status = 'AVAILABLE';
+  if (!role || role === 'CLIENT') filter.status = 'AVAILABLE';
   else if (query.status) filter.status = query.status;
 
   if (query.city) filter['address.city'] = query.city;
+  if (query.listingCategory) filter.listingCategory = query.listingCategory;
   if (query.assignedAgentId) filter.assignedAgentId = query.assignedAgentId;
   if (query.propertyType) filter['attributes.propertyType'] = query.propertyType;
   if (query.beds !== undefined) filter['attributes.beds'] = query.beds;

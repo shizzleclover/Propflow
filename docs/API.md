@@ -45,7 +45,7 @@ Body:
 ### `POST /users`
 Body:
 ```json
-{ "role": "AGENT", "name": "Ava Agent", "email": "ava@agency.com", "password": "..." }
+{ "role": "STAFF", "name": "Sam Staff", "email": "sam@agency.com", "password": "..." }
 ```
 201:
 ```json
@@ -92,6 +92,8 @@ Body:
 {
   "title": "2 bed apartment",
   "description": "Close to transit",
+  "listingCategory": "SALE",
+  "bookingEnabled": true,
   "assignedAgentId": "...",
   "address": { "line1": "1 Main St", "city": "Sydney" },
   "price": 900000,

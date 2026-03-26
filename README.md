@@ -22,3 +22,12 @@ Health check: `GET /health`
 Swagger UI: `GET /docs`
 OpenAPI JSON: `GET /openapi.json`
 
+### Seed demo data
+
+```bash
+npm run seed
+```
+
+Seed creates demo Admin, Agent, and Client accounts plus properties, bookings, and CRM notes.
+Default password for seeded users: `password123`
+

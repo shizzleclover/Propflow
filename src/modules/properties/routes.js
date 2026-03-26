@@ -1,10 +1,11 @@
 import { Router } from 'express';
 import { validate } from '../../lib/validate.js';
 import { Roles } from '../../lib/roles.js';
-import { requireAuth } from '../../middleware/auth.js';
+import { optionalAuth, requireAuth } from '../../middleware/auth.js';
 import { requireRole } from '../../middleware/rbac.js';
 import {
   createPropertyBody,
+  createPropertyBodyAgent,
   listPropertiesQuery,
   propertyIdParams,
   updatePropertyBodyAdmin,
@@ -22,28 +23,36 @@ export function propertiesRoutes() {
   const router = Router();
 
   // Public/client browsing is allowed, but clients only see AVAILABLE listings.
-  router.get('/', validate({ query: listPropertiesQuery }), async (req, res) => {
-    const isClient = req.auth?.role === Roles.CLIENT;
-    const props = await listProperties({ isClient, query: req.query });
+  router.get('/', optionalAuth, validate({ query: listPropertiesQuery }), async (req, res) => {
+    const props = await listProperties({ role: req.auth?.role, query: req.query });
     res.json({ properties: props });
   });
 
-  router.get('/:id', validate({ params: propertyIdParams }), async (req, res) => {
+  router.get('/:id', optionalAuth, validate({ params: propertyIdParams }), async (req, res) => {
     const property = await getPropertyById(req.params.id);
-    if (req.auth?.role === Roles.CLIENT && property.status !== 'AVAILABLE') {
+    if ((!req.auth?.role || req.auth?.role === Roles.CLIENT) && property.status !== 'AVAILABLE') {
       return res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Property not found' } });
     }
     res.json({ property });
   });
 
-  // Admin create/edit.
+  // Admin assigns agent; agent creates listing assigned to self.
   router.post(
     '/',
     requireAuth,
-    requireRole([Roles.ADMIN]),
-    validate({ body: createPropertyBody }),
+    requireRole([Roles.ADMIN, Roles.AGENT]),
+    (req, res, next) => {
+      if (req.auth.role === Roles.ADMIN) {
+        return validate({ body: createPropertyBody })(req, res, next);
+      }
+      return validate({ body: createPropertyBodyAgent })(req, res, next);
+    },
     async (req, res) => {
-      const property = await createProperty(req.body);
+      if (req.auth.role === Roles.ADMIN) {
+        const property = await createProperty(req.body);
+        return res.status(201).json({ property });
+      }
+      const property = await createProperty({ ...req.body, assignedAgentId: req.auth.sub });
       res.status(201).json({ property });
     }
   );

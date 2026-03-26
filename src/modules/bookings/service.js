@@ -38,6 +38,7 @@ export async function createBookingRequest({ auth, input }) {
 
   const property = await Property.findById(input.propertyId).lean();
   if (!property || property.status !== 'AVAILABLE') throw notFound('Property not found');
+  if (!property.bookingEnabled) throw forbidden('Viewing requests are disabled for this listing');
 
   const preferredSlots = input.preferredSlots.map(toSlot);
 

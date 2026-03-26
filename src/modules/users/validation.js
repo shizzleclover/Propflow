@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { Roles } from '../../lib/roles.js';
 
 export const createUserBody = z.object({
-  role: z.enum([Roles.ADMIN, Roles.AGENT]),
+  role: z.enum([Roles.ADMIN, Roles.STAFF, Roles.AGENT, Roles.CLIENT]),
   name: z.string().min(1).max(120),
   email: z.string().email(),
   password: z.string().min(8).max(200),
@@ -21,7 +21,7 @@ export const updateUserBody = z
 
 export const listUsersQuery = z
   .object({
-    role: z.enum([Roles.ADMIN, Roles.AGENT, Roles.CLIENT]).optional(),
+    role: z.enum([Roles.ADMIN, Roles.STAFF, Roles.AGENT, Roles.CLIENT]).optional(),
     status: z.enum(['ACTIVE', 'DEACTIVATED']).optional(),
   })
   .strict();
