@@ -21,12 +21,12 @@ async function main() {
   const passwordHash = await bcrypt.hash(defaultPassword, 12);
 
   const [admin, , agentA, agentB, clientA, clientB] = await User.create([
-    { role: Roles.ADMIN, status: 'ACTIVE', name: 'Admin One', email: 'admin@propflow.dev', passwordHash },
-    { role: Roles.STAFF, status: 'ACTIVE', name: 'Sam Staff', email: 'staff1@propflow.dev', passwordHash },
-    { role: Roles.AGENT, status: 'ACTIVE', name: 'Ava Agent', email: 'agent1@propflow.dev', passwordHash },
-    { role: Roles.AGENT, status: 'ACTIVE', name: 'Noah Agent', email: 'agent2@propflow.dev', passwordHash },
-    { role: Roles.CLIENT, status: 'ACTIVE', name: 'Liam Client', email: 'client1@propflow.dev', passwordHash },
-    { role: Roles.CLIENT, status: 'ACTIVE', name: 'Emma Client', email: 'client2@propflow.dev', passwordHash },
+    { role: Roles.ADMIN, status: 'ACTIVE', name: 'Nexa Admin', email: 'admin@nexahomes.dev', passwordHash },
+    { role: Roles.STAFF, status: 'ACTIVE', name: 'Nexa Staff', email: 'staff1@nexahomes.dev', passwordHash },
+    { role: Roles.AGENT, status: 'ACTIVE', name: 'Nexa Agent', email: 'agent1@nexahomes.dev', passwordHash },
+    { role: Roles.AGENT, status: 'ACTIVE', name: 'Nexa Agent Two', email: 'agent2@nexahomes.dev', passwordHash },
+    { role: Roles.CLIENT, status: 'ACTIVE', name: 'Nexa Client', email: 'client1@nexahomes.dev', passwordHash },
+    { role: Roles.CLIENT, status: 'ACTIVE', name: 'Nexa Client Two', email: 'client2@nexahomes.dev', passwordHash },
   ]);
 
   const u = (path) => `${path}?auto=format&fit=crop&w=1400&q=80`;
@@ -35,12 +35,12 @@ async function main() {
     {
       title: 'Modern 2-Bed Apartment',
       description: 'Close to transport and shopping.',
-      listingCategory: 'SALE',
+      listingCategory: 'RENT',
       bookingEnabled: true,
       status: 'AVAILABLE',
       assignedAgentId: agentA._id,
       address: { line1: '12 River St', city: 'Sydney', country: 'Australia' },
-      price: 930000,
+      price: 120000,
       imageUrls: [
         u('https://images.unsplash.com/photo-1564013799919-ab600027ffc6'),
         u('https://images.unsplash.com/photo-1600585154340-be6161a56a0c'),
@@ -51,12 +51,12 @@ async function main() {
     {
       title: 'Family Home with Garden',
       description: 'Quiet suburb and large backyard.',
-      listingCategory: 'SALE',
+      listingCategory: 'RENT',
       bookingEnabled: true,
       status: 'UNDER_OFFER',
       assignedAgentId: agentA._id,
       address: { line1: '88 Pine Ave', city: 'Sydney', country: 'Australia' },
-      price: 1450000,
+      price: 180000,
       imageUrls: [
         u('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9'),
         u('https://images.unsplash.com/photo-1600585154526-990dced4db0d'),
@@ -71,7 +71,7 @@ async function main() {
       status: 'AVAILABLE',
       assignedAgentId: agentB._id,
       address: { line1: '2 Central Blvd', city: 'Melbourne', country: 'Australia' },
-      price: 2450,
+      price: 95000,
       imageUrls: [
         u('https://images.unsplash.com/photo-1502672260266-1c1ef2d93688'),
         u('https://images.unsplash.com/photo-1522708323590-d24dbb6b0267'),
@@ -123,7 +123,7 @@ async function main() {
   console.log('Users (password for all): password123');
   // eslint-disable-next-line no-console
   console.log(
-    'admin@propflow.dev, staff1@propflow.dev, agent1@propflow.dev, agent2@propflow.dev, client1@propflow.dev, client2@propflow.dev'
+    'admin@nexahomes.dev, staff1@nexahomes.dev, agent1@nexahomes.dev, agent2@nexahomes.dev, client1@nexahomes.dev, client2@nexahomes.dev'
   );
 
   process.exit(0);
