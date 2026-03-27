@@ -15,6 +15,7 @@ import {
   cancelBooking,
   createBookingRequest,
   declineBooking,
+  getBookingById,
   listBookings,
   proposeBooking,
 } from './service.js';
@@ -32,6 +33,11 @@ export function bookingsRoutes() {
   router.get('/', validate({ query: listBookingsQuery }), async (req, res) => {
     const bookings = await listBookings({ auth: req.auth, query: req.query });
     res.json({ bookings });
+  });
+
+  router.get('/:id', validate({ params: bookingIdParams }), async (req, res) => {
+    const booking = await getBookingById({ auth: req.auth, bookingId: req.params.id });
+    res.json({ booking });
   });
 
   router.patch('/:id/approve', validate({ params: bookingIdParams, body: approveBody }), async (req, res) => {

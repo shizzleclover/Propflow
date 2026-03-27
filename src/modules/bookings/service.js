@@ -64,12 +64,30 @@ export async function listBookings({ auth, query }) {
   if (query.status) filter.status = query.status;
 
   const bookings = await Booking.find(filter)
+    .populate('propertyId', 'title listingCategory price address imageUrls status bookingEnabled')
+    .populate('agentId', 'name email')
+    .populate('clientId', 'name email')
     .sort({ updatedAt: -1 })
     .skip(query.offset)
     .limit(query.limit)
     .lean();
 
   return bookings;
+}
+
+export async function getBookingById({ auth, bookingId }) {
+  const booking = await Booking.findById(bookingId)
+    .populate('propertyId', 'title listingCategory price address imageUrls status bookingEnabled description')
+    .populate('agentId', 'name email')
+    .populate('clientId', 'name email')
+    .lean();
+
+  if (!booking) throw notFound('Booking not found');
+
+  if (auth.role === Roles.CLIENT && booking.clientId?._id?.toString() !== auth.sub) throw notFound('Booking not found');
+  if (auth.role === Roles.AGENT && booking.agentId?._id?.toString() !== auth.sub) throw notFound('Booking not found');
+
+  return booking;
 }
 
 export async function approveBooking({ auth, bookingId, confirmedSlot, agentNote }) {
