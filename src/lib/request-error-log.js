@@ -1,4 +1,5 @@
 import { AppError } from './errors.js';
+import { clientIp, safeUserAgent } from './logger.js';
 
 /**
  * Logs API errors to the console with status, code, route, and optional details.
@@ -7,11 +8,14 @@ import { AppError } from './errors.js';
  * @param {unknown} [originalErr] - Raw error before normalization (for 5xx stacks)
  */
 export function logRequestError(req, normalized, originalErr) {
+  const ip = clientIp(req);
+  const userAgent = safeUserAgent(req);
   const parts = [
     `[PropFlow API]`,
     `${normalized.status}`,
     normalized.code,
     `${req.method} ${req.originalUrl}`,
+    `ip=${ip}`,
     `— ${normalized.message}`,
   ];
 
@@ -41,5 +45,9 @@ export function logRequestError(req, normalized, originalErr) {
     } catch {
       console.warn('  details: [unserializable]');
     }
+  }
+
+  if (userAgent && userAgent !== 'unknown') {
+    console.warn(`  user-agent: ${userAgent}`);
   }
 }

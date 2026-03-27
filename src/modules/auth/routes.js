@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { validate } from '../../lib/validate.js';
+import { clientIp, safeUserAgent } from '../../lib/logger.js';
 import { requireAuth } from '../../middleware/auth.js';
 import { loginBody, registerClientBody } from './validation.js';
 import { login, registerClient } from './service.js';
@@ -16,7 +17,13 @@ export function authRoutes() {
   });
 
   router.post('/login', validate({ body: loginBody }), async (req, res) => {
-    const result = await login(req.body);
+    const result = await login({
+      ...req.body,
+      meta: {
+        ip: clientIp(req),
+        userAgent: safeUserAgent(req),
+      },
+    });
     res.json(result);
   });
 
