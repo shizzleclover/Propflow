@@ -66,7 +66,31 @@ export const updatePropertyBodyAdmin = z
 
 export const updatePropertyBodyAgent = z
   .object({
-    status: z.enum(['AVAILABLE', 'UNDER_OFFER', 'UNAVAILABLE']),
+    title: z.string().min(1).max(160).optional(),
+    description: z.string().max(5000).optional(),
+    listingCategory: z.enum(['SALE', 'RENT']).optional(),
+    bookingEnabled: z.boolean().optional(),
+    status: z.enum(['AVAILABLE', 'UNDER_OFFER', 'UNAVAILABLE']).optional(),
+    address: z
+      .object({
+        line1: z.string().min(1).max(200).optional(),
+        line2: z.string().max(200).optional(),
+        city: z.string().min(1).max(120).optional(),
+        state: z.string().max(120).optional(),
+        postalCode: z.string().max(40).optional(),
+        country: z.string().max(120).optional(),
+      })
+      .optional(),
+    price: z.number().nonnegative().optional(),
+    imageUrls: z.array(z.string().url()).max(24).optional(),
+    attributes: z
+      .object({
+        beds: z.number().int().nonnegative().optional(),
+        baths: z.number().int().nonnegative().optional(),
+        areaSqft: z.number().int().nonnegative().optional(),
+        propertyType: z.string().max(120).optional(),
+      })
+      .optional(),
   })
   .strict();
 

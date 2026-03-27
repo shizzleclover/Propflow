@@ -64,15 +64,29 @@ export async function updatePropertyAdmin({ id, patch }) {
   return property;
 }
 
-export async function updatePropertyAgent({ id, agentId, status }) {
+export async function updatePropertyAgent({ id, agentId, patch }) {
   const property = await Property.findById(id);
   if (!property) throw notFound('Property not found');
 
   if (property.assignedAgentId.toString() !== agentId) throw notFound('Property not found');
 
-  property.status = status;
+  Object.assign(property, patch);
   await property.save();
 
   return property;
+}
+
+export async function deletePropertyAdmin({ id }) {
+  const property = await Property.findByIdAndDelete(id);
+  if (!property) throw notFound('Property not found');
+  return { ok: true };
+}
+
+export async function deletePropertyAgent({ id, agentId }) {
+  const property = await Property.findById(id);
+  if (!property) throw notFound('Property not found');
+  if (property.assignedAgentId.toString() !== agentId) throw notFound('Property not found');
+  await property.deleteOne();
+  return { ok: true };
 }
 

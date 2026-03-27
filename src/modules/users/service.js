@@ -55,3 +55,10 @@ export async function updateUser({ id, patch }) {
   };
 }
 
+export async function deleteUser({ id, actorId }) {
+  if (id === actorId) throw badRequest('You cannot delete your own account');
+  const user = await User.findByIdAndDelete(id);
+  if (!user) throw notFound('User not found');
+  return { ok: true };
+}
+

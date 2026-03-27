@@ -13,6 +13,8 @@ import {
 } from './validation.js';
 import {
   createProperty,
+  deletePropertyAdmin,
+  deletePropertyAgent,
   getPropertyById,
   listProperties,
   updatePropertyAdmin,
@@ -77,7 +79,7 @@ export function propertiesRoutes() {
           const property = await updatePropertyAgent({
             id: req.params.id,
             agentId: req.auth.sub,
-            status: req.body.status,
+            patch: req.body,
           });
           res.json({ property });
         });
@@ -86,6 +88,18 @@ export function propertiesRoutes() {
       return res.status(403).json({ error: { code: 'FORBIDDEN', message: 'Forbidden' } });
     }
   );
+
+  router.delete('/:id', requireAuth, validate({ params: propertyIdParams }), async (req, res) => {
+    if (req.auth.role === Roles.ADMIN) {
+      await deletePropertyAdmin({ id: req.params.id });
+      return res.status(204).send();
+    }
+    if (req.auth.role === Roles.AGENT) {
+      await deletePropertyAgent({ id: req.params.id, agentId: req.auth.sub });
+      return res.status(204).send();
+    }
+    return res.status(403).json({ error: { code: 'FORBIDDEN', message: 'Forbidden' } });
+  });
 
   return router;
 }

@@ -3,7 +3,7 @@ import { validate } from '../../lib/validate.js';
 import { Roles } from '../../lib/roles.js';
 import { requireAuth } from '../../middleware/auth.js';
 import { requireRole } from '../../middleware/rbac.js';
-import { createUser, listUsers, updateUser } from './service.js';
+import { createUser, deleteUser, listUsers, updateUser } from './service.js';
 import { createUserBody, listUsersQuery, updateUserBody, updateUserParams } from './validation.js';
 
 export function usersRoutes() {
@@ -26,6 +26,11 @@ export function usersRoutes() {
   router.patch('/:id', validate({ params: updateUserParams, body: updateUserBody }), async (req, res) => {
     const user = await updateUser({ id: req.params.id, patch: req.body });
     res.json({ user });
+  });
+
+  router.delete('/:id', validate({ params: updateUserParams }), async (req, res) => {
+    await deleteUser({ id: req.params.id, actorId: req.auth.sub });
+    res.status(204).send();
   });
 
   return router;
