@@ -19,13 +19,22 @@ import { dashboardRoutes } from './modules/dashboard/routes.js';
 export function createApp() {
   const app = express();
   const openApiSpec = buildOpenApiSpec();
+  const startedAt = Date.now();
 
   app.use(helmet());
   app.use(cors());
   app.use(express.json({ limit: '1mb' }));
   app.use(morgan(env.LOG_FORMAT));
 
-  app.get('/health', (_req, res) => res.json({ ok: true }));
+  app.get('/health', (_req, res) =>
+    res.json({
+      ok: true,
+      service: 'nexa-homes-api',
+      env: env.NODE_ENV,
+      version: '1.1.0',
+      uptimeSec: Math.floor((Date.now() - startedAt) / 1000),
+    })
+  );
   app.get('/openapi.json', (_req, res) => res.json(openApiSpec));
   app.use('/docs', swaggerUi.serve, swaggerUi.setup(openApiSpec));
 
