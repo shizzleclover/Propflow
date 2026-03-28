@@ -15,6 +15,7 @@ import { propertiesRoutes } from './modules/properties/routes.js';
 import { bookingsRoutes } from './modules/bookings/routes.js';
 import { crmRoutes } from './modules/crm/routes.js';
 import { dashboardRoutes } from './modules/dashboard/routes.js';
+import { assistantRoutes } from './modules/assistant/routes.js';
 
 export function createApp() {
   const app = express();
@@ -44,6 +45,7 @@ export function createApp() {
   app.use('/bookings', bookingsRoutes());
   app.use('/crm', crmRoutes());
   app.use('/dashboard', dashboardRoutes());
+  app.use('/assistant', assistantRoutes());
 
   app.use(notFound);
   app.use(errorHandler);
