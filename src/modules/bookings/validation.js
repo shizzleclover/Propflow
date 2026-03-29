@@ -45,4 +45,6 @@ export const cancelBody = z
     clientNote: z.string().max(2000).optional(),
   })
   .strict();
-
+export const addMessageBody = z.object({
+  text: z.string().min(1).max(2000),
+});

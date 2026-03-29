@@ -49,6 +49,7 @@ export async function createBookingRequest({ auth, input }) {
     status: 'PENDING',
     preferredSlots,
     clientNote: input.clientNote ?? '',
+    messages: input.clientNote ? [{ senderId: auth.sub, role: auth.role, text: input.clientNote }] : [],
   });
 
   return booking;
@@ -108,7 +109,12 @@ export async function approveBooking({ auth, bookingId, confirmedSlot, agentNote
   booking.status = 'APPROVED';
   booking.confirmedSlot = slot;
   booking.proposedSlot = null;
-  if (agentNote !== undefined) booking.agentNote = agentNote;
+  if (agentNote !== undefined) {
+    booking.agentNote = agentNote;
+    booking.messages.push({ senderId: auth.sub, role: auth.role, text: agentNote || 'Booking approved' });
+  } else {
+    booking.messages.push({ senderId: auth.sub, role: auth.role, text: 'Booking approved' });
+  }
   await booking.save();
 
   return booking;
@@ -126,7 +132,12 @@ export async function proposeBooking({ auth, bookingId, proposedSlot, agentNote 
   booking.status = 'PROPOSED';
   booking.proposedSlot = slot;
   booking.confirmedSlot = null;
-  if (agentNote !== undefined) booking.agentNote = agentNote;
+  if (agentNote !== undefined) {
+    booking.agentNote = agentNote;
+    booking.messages.push({ senderId: auth.sub, role: auth.role, text: agentNote || 'New slot proposed' });
+  } else {
+    booking.messages.push({ senderId: auth.sub, role: auth.role, text: 'New slot proposed' });
+  }
   await booking.save();
 
   return booking;
@@ -142,7 +153,12 @@ export async function declineBooking({ auth, bookingId, agentNote }) {
   booking.status = 'DECLINED';
   booking.proposedSlot = null;
   booking.confirmedSlot = null;
-  if (agentNote !== undefined) booking.agentNote = agentNote;
+  if (agentNote !== undefined) {
+    booking.agentNote = agentNote;
+    booking.messages.push({ senderId: auth.sub, role: auth.role, text: agentNote || 'Booking declined' });
+  } else {
+    booking.messages.push({ senderId: auth.sub, role: auth.role, text: 'Booking declined' });
+  }
   await booking.save();
 
   return booking;
@@ -158,9 +174,31 @@ export async function cancelBooking({ auth, bookingId, clientNote }) {
   booking.status = 'CANCELLED';
   booking.proposedSlot = null;
   booking.confirmedSlot = null;
-  if (clientNote !== undefined) booking.clientNote = clientNote;
+  if (clientNote !== undefined) {
+    booking.clientNote = clientNote;
+    booking.messages.push({ senderId: auth.sub, role: auth.role, text: clientNote || 'Booking cancelled' });
+  } else {
+    booking.messages.push({ senderId: auth.sub, role: auth.role, text: 'Booking cancelled' });
+  }
   await booking.save();
 
+  return booking;
+}
+
+export async function addBookingMessage({ auth, bookingId, text }) {
+  const booking = await Booking.findById(bookingId);
+  if (!booking) throw notFound('Booking not found');
+
+  if (auth.role === Roles.CLIENT && booking.clientId.toString() !== auth.sub) throw forbidden();
+  if (auth.role === Roles.AGENT && booking.agentId.toString() !== auth.sub) throw forbidden();
+
+  booking.messages.push({
+    senderId: auth.sub,
+    role: auth.role,
+    text,
+  });
+
+  await booking.save();
   return booking;
 }
 

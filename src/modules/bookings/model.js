@@ -24,6 +24,14 @@ const bookingSchema = new mongoose.Schema(
     confirmedSlot: { type: slotSchema, default: null },
     clientNote: { type: String, trim: true, default: '' },
     agentNote: { type: String, trim: true, default: '' },
+    messages: [
+      {
+        senderId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+        role: { type: String, required: true },
+        text: { type: String, required: true },
+        createdAt: { type: Date, default: Date.now },
+      },
+    ],
   },
   { timestamps: true }
 );

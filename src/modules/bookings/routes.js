@@ -4,6 +4,7 @@ import { requireAuth } from '../../middleware/auth.js';
 import {
   approveBody,
   bookingIdParams,
+  addMessageBody,
   cancelBody,
   createBookingBody,
   declineBody,
@@ -11,6 +12,7 @@ import {
   proposeBody,
 } from './validation.js';
 import {
+  addBookingMessage,
   approveBooking,
   cancelBooking,
   createBookingRequest,
@@ -76,6 +78,15 @@ export function bookingsRoutes() {
       clientNote: req.body.clientNote,
     });
     res.json({ booking });
+  });
+
+  router.post('/:id/messages', validate({ params: bookingIdParams, body: addMessageBody }), async (req, res) => {
+    const booking = await addBookingMessage({
+      auth: req.auth,
+      bookingId: req.params.id,
+      text: req.body.text,
+    });
+    res.status(201).json({ booking });
   });
 
   return router;
